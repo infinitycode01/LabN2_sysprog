@@ -16,6 +16,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,7 +58,37 @@ public class RemakeApplication extends Application {
             HBox hBoxMenu = new HBox();
             hBoxMenu.setPadding(new Insets(20));
             hBoxMenu.setSpacing(10);
+
+            Button buttonNext = new Button("Next");
+            buttonNext.setDisable(true);
+
             Button buttonRemake = new Button("Remake");
+            buttonRemake.setOnMouseClicked(mouseEvent -> {
+                if (textFieldMask.getText().isEmpty()) {
+                    fontErrorMask.setVisible(true);
+                    return;
+                } else fontErrorMask.setVisible(false);
+                textAreaOutput.clear();
+
+                String[] splited = WordMatch.getSplitedWord(textArea.getText());
+
+                AtomicInteger currentIndex = new AtomicInteger(0);
+
+                buttonNext.setDisable(false);
+                buttonNext.setOnMouseClicked(mouseEvent1 -> {
+                    if (currentIndex.get() < splited.length) {
+                        String word = splited[currentIndex.getAndIncrement()];
+                        Pattern pattern = Pattern.compile(MaskParser.parseMaskToRegex(textFieldMask.getText()));
+                        Matcher matcher = pattern.matcher(word);
+                        while (matcher.find()) {
+                            textAreaOutput.setText(textAreaOutput.getText() + WordMatch.convertWord(word) + ' ');
+                        }
+                    } else {
+                        buttonNext.setDisable(true);
+                    }
+                });
+            });
+
             Button buttonRemakeAll = new Button("Remake all");
             buttonRemakeAll.setOnMouseClicked(mouseEvent -> {
                 if (textFieldMask.getText().isEmpty()) {
@@ -78,7 +109,11 @@ public class RemakeApplication extends Application {
             });
 
             Button buttonClose = new Button("Close");
-            hBoxMenu.getChildren().addAll(buttonRemake, buttonRemakeAll, buttonClose);
+            buttonClose.setOnMouseClicked(mouseEvent -> {
+                newStage.close();
+            });
+
+            hBoxMenu.getChildren().addAll(buttonNext, buttonRemake, buttonRemakeAll, buttonClose);
 
             GridPane gridPane = new GridPane();
             gridPane.add(hBoxMask, 0, 0);

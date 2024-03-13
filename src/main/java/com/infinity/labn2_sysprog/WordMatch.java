@@ -25,24 +25,4 @@ public class WordMatch {
         String[] splited = splitPattern.split(text);
         return splited;
     }
-
-
-
-    public static void main(String[] args) {
-        String mask = "G%d";
-        String text = "Good     VeryGoood   \n nice Gooood goood";
-        Pattern splitPattern = Pattern.compile("[\\s\\n\\t\\r\\f]+");
-        String[] splited = splitPattern.split(text);
-
-        for (String s : splited) {
-            System.out.println(s);
-        }
-
-        Pattern pattern = Pattern.compile(MaskParser.parseMaskToRegex(mask));
-        Matcher matcher = pattern.matcher(splited[1]);
-        while (matcher.find()) {
-            System.out.println("Find word: " + splited[1]);
-            System.out.println(convertWord(splited[1]));
-        }
-    }
 }
