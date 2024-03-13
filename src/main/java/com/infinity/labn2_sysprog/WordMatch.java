@@ -4,38 +4,45 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WordMatch {
-    /*public static void main(String[] args) {
-        String input = "aaahgfuuuul";
-        String regex = "(\\w)\\1+"; // находит последовательности повторяющихся символов
+    public static String convertWord(String word) {
+        String regex = "(\\w)\\1+";
         Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
+        Matcher matcher = pattern.matcher(word);
 
         StringBuffer result = new StringBuffer();
         while (matcher.find()) {
             String repeatedChar = matcher.group(1);
             int count = matcher.group().length();
-            matcher.appendReplacement(result, repeatedChar + "(" + count + ")");
+            matcher.appendReplacement(result, count + "(" + repeatedChar + ")");
         }
         matcher.appendTail(result);
 
-        System.out.println(result.toString());
-    }*/
+        return result.toString();
+    }
+
+    public static String[] getSplitedWord(String text) {
+        Pattern splitPattern = Pattern.compile("[\\s\\n\\t\\r\\f]+");
+        String[] splited = splitPattern.split(text);
+        return splited;
+    }
+
+
 
     public static void main(String[] args) {
-        String inputText = "abc abbc abbbc abbbbc abbbbbc xyz"; // Пример входного текста
-        String mask = "%abc%d"; // Пример маски
+        String mask = "G%d";
+        String text = "Good     VeryGoood   \n nice Gooood goood";
+        Pattern splitPattern = Pattern.compile("[\\s\\n\\t\\r\\f]+");
+        String[] splited = splitPattern.split(text);
 
-        // Экранируем специальные символы в маске и создаем регулярное выражение
-        String regex = mask.replace("%", "\\\\w+").replace("d", "\\\\d");
+        for (String s : splited) {
+            System.out.println(s);
+        }
 
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(inputText);
-
-        System.out.println("Слова, соответствующие маске " + mask + ":");
-
-        // Выводим найденные слова
+        Pattern pattern = Pattern.compile(MaskParser.parseMaskToRegex(mask));
+        Matcher matcher = pattern.matcher(splited[1]);
         while (matcher.find()) {
-            System.out.println(matcher.group());
+            System.out.println("Find word: " + splited[1]);
+            System.out.println(convertWord(splited[1]));
         }
     }
 }

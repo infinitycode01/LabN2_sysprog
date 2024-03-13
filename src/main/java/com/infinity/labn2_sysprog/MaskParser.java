@@ -7,12 +7,8 @@ public class MaskParser {
         for (int i = 0; i < mask.length(); i++) {
             char currentChar = mask.charAt(i);
 
-            if (currentChar == '%') {
-                // тут додаєм ланцюг однакових літер або символів
-            } else {
-                // тут коли ми знайшли звичайну літери чи символ
-            }
-
+            if (currentChar == '%') regex.append("(\\w+)");
+            else regex.append(currentChar);
         }
 
         return regex.toString();
