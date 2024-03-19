@@ -1,18 +1,14 @@
 package com.infinity.labn2_sysprog;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -20,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// В новому вікні видалити вікно output і заміняти слова в input вікні
 public class RemakeApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
@@ -28,7 +25,7 @@ public class RemakeApplication extends Application {
         vBox.setSpacing(10);
 
         TextArea textArea = new TextArea();
-        Label label = new Label("Input");
+        Label label = new Label("Text area");
         Button button = new Button("Remake");
 
         vBox.getChildren().addAll(label, textArea, button);
@@ -47,14 +44,6 @@ public class RemakeApplication extends Application {
             TextField textFieldMask = new TextField();
             hBoxMask.getChildren().addAll(labelMask, textFieldMask, fontErrorMask);
 
-            HBox hBoxText = new HBox();
-            hBoxText.setPadding(new Insets(20));
-            hBoxText.setSpacing(10);
-            Label labelOutput = new Label("Output");
-            TextArea textAreaOutput = new TextArea();
-            textAreaOutput.setMaxWidth(400);
-            hBoxText.getChildren().addAll(labelOutput, textAreaOutput);
-
             HBox hBoxMenu = new HBox();
             hBoxMenu.setPadding(new Insets(20));
             hBoxMenu.setSpacing(10);
@@ -68,25 +57,30 @@ public class RemakeApplication extends Application {
                     fontErrorMask.setVisible(true);
                     return;
                 } else fontErrorMask.setVisible(false);
-                textAreaOutput.clear();
 
                 String[] splited = WordMatch.getSplitedWord(textArea.getText());
 
-                AtomicInteger currentIndex = new AtomicInteger(0);
+                //AtomicInteger currentIndex = new AtomicInteger(0);
+
 
                 buttonNext.setDisable(false);
+
+                int[] currentIndex = {0};
+
                 buttonNext.setOnMouseClicked(mouseEvent1 -> {
-                    if (currentIndex.get() < splited.length) {
-                        String word = splited[currentIndex.getAndIncrement()];
+                    while (currentIndex[0] < splited.length) {
+                        String word = splited[currentIndex[0]];
                         Pattern pattern = Pattern.compile(MaskParser.parseMaskToRegex(textFieldMask.getText()));
                         Matcher matcher = pattern.matcher(word);
-                        while (matcher.find()) {
-                            textAreaOutput.setText(textAreaOutput.getText() + WordMatch.convertWord(word) + ' ');
+                        if (matcher.find()) {
+                            textArea.setText(textArea.getText().replace(word, WordMatch.convertWord(word)));
+                            currentIndex[0] = (currentIndex[0] + 1) % splited.length;
+                            break;
                         }
-                    } else {
-                        buttonNext.setDisable(true);
+                        currentIndex[0] = (currentIndex[0] + 1) % splited.length;
                     }
                 });
+
             });
 
             Button buttonRemakeAll = new Button("Remake all");
@@ -95,15 +89,14 @@ public class RemakeApplication extends Application {
                     fontErrorMask.setVisible(true);
                     return;
                 } else fontErrorMask.setVisible(false);
-                textAreaOutput.clear();
 
                 String[] splited = WordMatch.getSplitedWord(textArea.getText());
 
                 for (String word : splited) {
                     Pattern pattern = Pattern.compile(MaskParser.parseMaskToRegex(textFieldMask.getText()));
                     Matcher matcher = pattern.matcher(word);
-                    while (matcher.find()) {
-                        textAreaOutput.setText(textAreaOutput.getText() + WordMatch.convertWord(word) + ' ');
+                    if (matcher.find()) {
+                        textArea.setText(textArea.getText().replace(word, WordMatch.convertWord(word)));
                     }
                 }
             });
@@ -117,10 +110,9 @@ public class RemakeApplication extends Application {
 
             GridPane gridPane = new GridPane();
             gridPane.add(hBoxMask, 0, 0);
-            gridPane.add(hBoxText, 0, 1);
-            gridPane.add(hBoxMenu, 0, 2);
+            gridPane.add(hBoxMenu, 0, 1);
 
-            Scene newScene = new Scene(gridPane, 500, 350);
+            Scene newScene = new Scene(gridPane, 500, 150);
             newStage.setScene(newScene);
             newStage.show();
         });
@@ -133,4 +125,7 @@ public class RemakeApplication extends Application {
     public static void main(String[] args) {
         launch();
     }
+
+
 }
+
